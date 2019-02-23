@@ -17,10 +17,10 @@ all: iGame
 CC			= m68k-amigaos-gcc
 LINK		= m68k-amigaos-gcc
 INCLUDES	= 
-CFLAGS		= -c -O2 -std=c99
-CFLAGS_030	= -c -m68030 -O2 -std=c99
-CFLAGS_040	= -c -m68040 -O2 -std=c99
-CFLAGS_060	= -c -m68060 -O2 -std=c99
+CFLAGS		= -c -O2 -std=c99 -noixemul
+CFLAGS_030	= -c -m68030 -O2 -std=c99 -noixemul
+CFLAGS_040	= -c -m68040 -O2 -std=c99 -noixemul
+CFLAGS_060	= -c -m68060 -O2 -std=c99 -noixemul
 
 DATE = $(shell date --iso=date)
 
@@ -28,7 +28,7 @@ DATE = $(shell date --iso=date)
 # Builder settings
 ##########################################################################
 #MKLIB			= join
-LIBFLAGS		= -v -lamiga -lstubs -lmui -o
+LIBFLAGS		= -noixemul -lamiga -lstubs -lmui -o
 
 ##########################################################################
 # Object files which are part of iGame
