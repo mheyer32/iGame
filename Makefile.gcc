@@ -16,19 +16,19 @@ all: iGame
 ##########################################################################
 CC			= m68k-amigaos-gcc
 LINK		= m68k-amigaos-gcc
-INCLUDES	= 
-CFLAGS		= -c -O2 -std=c99 -noixemul
-CFLAGS_030	= -c -m68030 -O2 -std=c99 -noixemul
-CFLAGS_040	= -c -m68040 -O2 -std=c99 -noixemul
-CFLAGS_060	= -c -m68060 -O2 -std=c99 -noixemul
+STRIP		= m68k-amigaos-strip
+INCLUDES	=
+
+BUILD_FLAGS = -std=c99 -Os -flto -g -ggdb -noixemul
+
+CFLAGS		= $(BUILD_FLAGS) -c -Werror -Wno-int-conversion
 
 DATE = $(shell date --iso=date)
 
 ##########################################################################
 # Builder settings
 ##########################################################################
-#MKLIB			= join
-LIBFLAGS		= -noixemul -lamiga -lstubs -lmui -o
+LIBFLAGS		= $(BUILD_FLAGS) -lamiga -lstubs -lmui
 
 ##########################################################################
 # Object files which are part of iGame
@@ -37,131 +37,76 @@ OBJS		= src/funcs.o src/iGameGUI.o src/iGameMain.o src/strdup.o src/iGameStrings
 OBJS_030	= src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strdup_030.o src/iGameStrings_cat_030.o
 OBJS_040	= src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/strdup_040.o src/iGameStrings_cat_040.o
 OBJS_060	= src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/strdup_060.o src/iGameStrings_cat_060.o
-OBJS_MOS	= src/funcs_MOS.o src/iGameGUI_MOS.o src/iGameMain_MOS.o src/strdup_MOS.o src/iGameStrings_cat_MOS.o
-OBJS_AOS4	= src/funcs_AOS4.o src/iGameGUI_AOS4.o src/iGameMain_AOS4.o src/strdup_AOS4.o src/iGameStrings_cat_AOS4.o
 
 ##########################################################################
 # Rule for building
 ##########################################################################
-iGame: $(OBJS)
-	$(LINK) $(OBJS) $(LIBFLAGS) $@
+version.h:
+	echo "#ifndef VERSION" > src/version.h
+	echo "#define VERSION \"\$$VER:version 2.0b4 ("$(DATE)")"\" >> src/version.h
+	echo "#endif" >> src/version.h
 
-iGame.030: $(OBJS_030)
-	$(LINK) $(OBJS_030) $(LIBFLAGS) $@
+iGame: version.h $(OBJS)
+	$(LINK) $(OBJS) $(LIBFLAGS) -o $@
 
-iGame.040: $(OBJS_040)
-	$(LINK) $(OBJS_040) $(LIBFLAGS) $@
+iGame.030: version.h $(OBJS_030)
+	$(LINK) $(OBJS_030) $(LIBFLAGS) -m68030 -o $@
 
-iGame.060: $(OBJS_060)
-	$(LINK) $(OBJS_060) $(LIBFLAGS) $@
+iGame.040: version.h $(OBJS_040)
+	$(LINK) $(OBJS_040) $(LIBFLAGS) -m68040 -o $@
 
-iGame.MOS: $(OBJS_MOS)
-	$(LINK) $(OBJS_MOS) $(LIBFLAGS_MOS) $@
-
-iGame.AOS4: $(OBJS_AOS4)
-	$(LINK) $(OBJS_AOS4) $(LIBFLAGS_AOS4) $@
+iGame.060: version.h $(OBJS_060)
+	$(LINK) $(OBJS_060) $(LIBFLAGS) -m68060 -o $@
 
 ##########################################################################
 # object files (generic 00)
 ##########################################################################
-src/funcs.o: src/funcs.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/funcs.c
-
-src/iGameGUI.o: src/iGameGUI.c src/iGameGUI.h src/version.h
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/iGameGUI.c
-
-src/iGameMain.o: src/iGameMain.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/iGameMain.c
-
-src/strdup.o: src/strdup.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/strdup.c
-
-src/iGameStrings_cat.o: src/iGameStrings_cat.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/iGameStrings_cat.c
+%.o: %.c $(if $(filter release,${MAKECMDGOALS}),clean)
+	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
 
 ##########################################################################
 # object files (030)
 ##########################################################################
 
-src/funcs_030.o: src/funcs.c
-	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/funcs.c
-
-src/iGameGUI_030.o: src/iGameGUI.c src/iGameGUI.h
-	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/iGameGUI.c
-
-src/iGameMain_030.o: src/iGameMain.c
-	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/iGameMain.c
-
-src/strdup_030.o: src/strdup.c
-	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/strdup.c
-
-src/iGameStrings_cat_030.o: src/iGameStrings_cat.c
-	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/iGameStrings_cat.c
+%_030.o: %.c $(if $(filter release,${MAKECMDGOALS}),clean)
+	$(CC) $(CFLAGS) -m68030 $(INCLUDES) $< -o $@
 
 ##########################################################################
 # object files (040)
 ##########################################################################
 
-src/funcs_040.o: src/funcs.c
-	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/funcs.c
-
-src/iGameGUI_040.o: src/iGameGUI.c src/iGameGUI.h
-	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGameGUI.c
-
-src/iGameMain_040.o: src/iGameMain.c
-	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGameMain.c
-
-src/strdup_040.o: src/strdup.c
-	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/strdup.c
-	
-src/iGameStrings_cat_040.o: src/iGameStrings_cat.c
-	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGameStrings_cat.c
+%_040.o: %.c $(if $(filter release,${MAKECMDGOALS}),clean)
+	$(CC) $(CFLAGS) -m68040 $(INCLUDES) $< -o $@
 
 ##########################################################################
 # object files (060)
 ##########################################################################
 
-src/funcs_060.o: src/funcs.c
-	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/funcs.c
-
-src/iGameGUI_060.o: src/iGameGUI.c src/iGameGUI.h
-	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/iGameGUI.c
-
-src/iGameMain_060.o: src/iGameMain.c
-	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/iGameMain.c
-
-src/strdup_060.o: src/strdup.c
-	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/strdup.c
-
-src/iGameStrings_cat_060.o: src/iGameStrings_cat.c
-	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/iGameStrings_cat.c
+%_060.o: %.c $(if $(filter release,${MAKECMDGOALS}),clean)
+	$(CC) $(CFLAGS) -m68060 $(INCLUDES) $< -o $@
 
 ##########################################################################
 # generic build options
 ##########################################################################
-
+.PHONY: clean
 clean:
-	rm iGame iGame.* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strdup*.o src/iGameStrings_cat*.o
+	rm -f iGame iGame.0* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strdup*.o src/iGameStrings_cat*.o
 
 # pack everything in a nice lha file
-release:
+release: clean iGame iGame.030 iGame.040 iGame.060
 	rm -rf iGame_rel/iGame/
 	rm -f iGame_rel/iGame.info
 	mkdir -p iGame_rel/iGame-$(DATE)
-	echo "#ifndef VERSION" > src/version.h
-	echo "#define VERSION \"\$$VER:version 2.0b4 ("$(DATE)")"\" >> src/version.h
-	echo "#endif" >> src/version.h
-	make iGame -f Makefile.gcc
-	make iGame.030 -f Makefile.gcc
-	make iGame.040 -f Makefile.gcc
-	make iGame.060 -f Makefile.gcc
-	cp iGame iGame_rel/iGame-$(DATE)/
-	cp iGame.030 iGame_rel/iGame-$(DATE)/
-	cp iGame.040 iGame_rel/iGame-$(DATE)/
-	cp iGame.060 iGame_rel/iGame-$(DATE)/
+	$(STRIP) --strip-debug --strip-unneeded iGame -o iGame_rel/iGame-$(DATE)/iGame
+	$(STRIP) --strip-debug --strip-unneeded iGame.030 -o iGame_rel/iGame-$(DATE)/iGame.030
+	$(STRIP) --strip-debug --strip-unneeded iGame.040 -o iGame_rel/iGame-$(DATE)/iGame.040
+	$(STRIP) --strip-debug --strip-unneeded iGame.060 -o iGame_rel/iGame-$(DATE)/iGame.060
 	cp required_files/genres iGame_rel/iGame-$(DATE)/
 	cp required_files/igame.iff iGame_rel/iGame-$(DATE)/
 	cp required_files/iGame.info iGame_rel/iGame-$(DATE)/
+	cp required_files/iGame.info iGame_rel/iGame-$(DATE)/iGame.030.info
+	cp required_files/iGame.info iGame_rel/iGame-$(DATE)/iGame.040.info
+	cp required_files/iGame.info iGame_rel/iGame-$(DATE)/iGame.060.info
 	cp required_files/igame_drawer_3.0.info iGame_rel/iGame.info
 	cp guide/* iGame_rel/iGame-$(DATE)/
 	mkdir iGame_rel/iGame-$(DATE)/Icons/
