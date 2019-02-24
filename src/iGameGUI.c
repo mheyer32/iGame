@@ -23,8 +23,8 @@
 #define MUI_OBSOLETE
 
 #include <libraries/mui.h>
-
 #include <clib/alib_protos.h>
+#include <clib/muimaster_protos.h>
 #include <proto/exec.h>
 
 #include <mui/Guigfx_mcc.h>

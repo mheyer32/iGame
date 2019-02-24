@@ -21,27 +21,24 @@
 */
 
 #include <clib/exec_protos.h>
+#include <clib/icon_protos.h>
 #include <clib/dos_protos.h>
 #include <clib/alib_protos.h>
-#include <clib/icon_protos.h>
+#include <clib/muimaster_protos.h>
+#include <clib/graphics_protos.h>
+#include <ctype.h>
+#include <exec/memory.h>
+#include <libraries/asl.h>
 #include <libraries/mui.h>
 #include <mui/Guigfx_mcc.h>
 #include <mui/TextEditor_mcc.h>
-#include <clib/muimaster_protos.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include <exec/memory.h>
-#include <workbench/startup.h>
-#include <exec/types.h>
-#include <workbench/workbench.h>
-#include <clib/graphics_protos.h>
+#include <string.h>
 
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
-#include <libraries/asl.h>
 
 extern char* strdup(const char* s);
 extern struct ObjApp* app;
